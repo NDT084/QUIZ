@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,7 +44,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
             opacity: 0.6;
             pointer-events: none;
         }
@@ -65,9 +66,9 @@
         .option-button.correct {
             background: linear-gradient(145deg, #4ade80, #16a34a);
             color: white;
-            animation: pulse 0.6s forwards;
+            animation: popAndPulse 0.6s forwards;
             font-weight: 600;
-            box-shadow: 0 4px 20px rgba(74, 222, 128, 0.4);
+            box-shadow: 0 0 40px rgba(74, 222, 128, 0.7);
         }
 
         .option-button.incorrect {
@@ -79,20 +80,50 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        @keyframes popAndPulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+            }
+
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 0 60px rgba(74, 222, 128, 0.9);
+            }
+
+            100% {
+                transform: scale(1.05);
+                box-shadow: 0 0 40px rgba(74, 222, 128, 0.7);
+            }
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-8px); }
-            40%, 80% { transform: translateX(8px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-8px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(8px);
+            }
         }
 
         /* Message de feedback */
@@ -105,41 +136,28 @@
             opacity: 1;
         }
 
-        /* Conteneur de la photo avec un joli cercle */
-        .image-container {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 4px solid #3b82f6;
-            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.3);
-            margin: 0 auto 1.5rem;
-            transition: transform 0.3s ease;
-        }
-
-        .image-container:hover {
-            transform: scale(1.05);
-        }
-        
         .next-btn-pulse {
             animation: pulse-btn 1.5s infinite;
         }
-        
+
         @keyframes pulse-btn {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
         }
     </style>
 </head>
+
 <body class="bg-gray-100 text-gray-800">
 
     <div id="game-container" class="quiz-card">
         <h1 class="text-3xl font-extrabold mb-6 text-gray-900">Quiz de l'Administration</h1>
-
-        <!-- Conteneur de la photo du membre -->
-        <div class="image-container">
-            <img id="personPhoto" src="" alt="Photo du membre de l'administration" class="w-full h-full object-cover">
-        </div>
 
         <!-- Nom du membre -->
         <h2 id="personName" class="text-2xl font-bold mb-4 text-gray-800"></h2>
@@ -158,72 +176,68 @@
         </div>
 
         <!-- Bouton pour passer à la question suivante ou rejouer -->
-        <button id="nextQuestionBtn" class="mt-6 bg-blue-600 text-white font-bold py-3 px-6 rounded-full opacity-0 pointer-events-none transition-opacity duration-300 transform hover:scale-105">
+        <button id="nextQuestionBtn"
+            class="mt-6 bg-blue-600 text-white font-bold py-3 px-6 rounded-full opacity-0 pointer-events-none transition-opacity duration-300 transform hover:scale-105">
             Suivant
         </button>
     </div>
 
+    <!-- Audio pour les effets sonores -->
+    <audio id="correctSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+    <audio id="incorrectSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+        preload="auto"></audio>
+
     <script>
         const people = [
             {
-                name: "Madame Dubois",
-                role: "Directrice Générale",
-                photo: "https://placehold.co/150x150/93c5fd/ffffff?text=Directrice",
-                options: ["Directrice Générale", "Chef des Services Techniques", "Responsable des Admissions"]
+                name: "M. Abdou SAMBÉ",
+                role: "Président Directeur Général (PDG)",
+                options: ["Président Directeur Général (PDG)", "Directeur Général", "Directrice Pédagogique"]
             },
             {
-                name: "Monsieur Dupont",
-                role: "Chef des Services Techniques",
-                photo: "https://placehold.co/150x150/93c5fd/ffffff?text=Technicien",
-                options: ["Responsable des Admissions", "Chef des Services Techniques", "Directrice Générale"]
+                name: "M. Thierno SAMBÉ",
+                role: "Directeur Général",
+                options: ["Directeur Général", "Chef de département Réseaux & Systèmes", "Président Directeur Général (PDG)"]
             },
             {
-                name: "Mademoiselle Léger",
-                role: "Responsable des Admissions",
-                photo: "https://placehold.co/150x150/93c5fd/ffffff?text=Admissions",
-                options: ["Chef des Services Techniques", "Responsable de la Cantine", "Responsable des Admissions"]
+                name: "Mme Mané DIOP",
+                role: "Directrice Administrative et Financière",
+                options: ["Directrice Administrative et Financière", "Secrétaire du chef du département IA", "Directrice des Etudes"]
             },
             {
-                name: "Monsieur Bernard",
-                role: "Trésorier",
-                photo: "https://placehold.co/150x150/93c5fd/ffffff?text=Trésorier",
-                options: ["Trésorier", "Coordinateur Pédagogique", "Directrice Générale"]
+                name: "Mme Aissatou G. DIOMBERA",
+                role: "Directrice Pédagogique",
+                options: ["Directrice Pédagogique", "Directeur Général", "Directrice Administrative et Financière"]
             },
             {
-                name: "Madame Gauthier",
-                role: "Coordinatrice Pédagogique",
-                photo: "https://placehold.co/150x150/93c5fd/ffffff?text=Coordinatrice",
-                options: ["Directrice Générale", "Coordinatrice Pédagogique", "Responsable des Admissions"]
+                name: "M. El Hadji Mor DIAW",
+                role: "Chef de département Génie informatique",
+                options: ["Chef de département Génie informatique", "Chef de département Réseaux & Systèmes", "Chef de département IA & Ingénierie de données"]
             },
             {
-                name: "Monsieur Lefebvre",
-                role: "Responsable des Affaires Scolaires",
-                photo: "https://placehold.co/150x150/93c5fd/ffffff?text=Scolaires",
-                options: ["Responsable des Affaires Scolaires", "Chef des Services Techniques", "Directrice Générale"]
+                name: "Dr Latyr NDIAYE",
+                role: "Chef de département Réseaux & Systèmes",
+                options: ["Chef de département Réseaux & Systèmes", "Directeur Général", "Chef de département Génie informatique"]
             },
             {
-                name: "Madame Bertrand",
-                role: "Secrétaire Principale",
-                photo: "https://placehold.co/150x150/93c5fd/ffffff?text=Secrétaire",
-                options: ["Secrétaire Principale", "Trésorier", "Coordinatrice Pédagogique"]
+                name: "M. Ibrahima SY",
+                role: "Chef de département IA & Ingénierie de données",
+                options: ["Chef de département IA & Ingénierie de données", "Directrice Pédagogique", "Chef de département Réseaux & Systèmes"]
             },
             {
-                name: "Monsieur Martin",
-                role: "Responsable de la Communication",
-                photo: "https://placehold.co/150x150/93c5fd/ffffff?text=Communication",
-                options: ["Responsable des Admissions", "Responsable de la Communication", "Chef des Services Techniques"]
+                name: "Ramatoulaye",
+                role: "Secrétaire du chef du département réseaux et systèmes",
+                options: ["Secrétaire du chef du département réseaux et systèmes", "Secrétaire du chef du département IA", "Directrice des Etudes"]
             },
             {
-                name: "Madame Leroy",
-                role: "Responsable des Ressources Humaines",
-                photo: "https://placehold.co/150x150/93c5fd/ffffff?text=RH",
-                options: ["Responsable des Ressources Humaines", "Coordinatrice Pédagogique", "Directrice Générale"]
+                name: "Dieynaba",
+                role: "Secrétaire du chef du département IA",
+                options: ["Secrétaire du chef du département IA", "Directrice Administrative et Financière", "Président Directeur Général (PDG)"]
             },
             {
-                name: "Monsieur Petit",
-                role: "Conseiller d'Orientation",
-                photo: "https://placehold.co/150x150/93c5fd/ffffff?text=Conseiller",
-                options: ["Conseiller d'Orientation", "Trésorier", "Responsable de la Communication"]
+                name: "Aissatou Diaby GASSAMA",
+                role: "Directrice des Etudes",
+                options: ["Directrice des Etudes", "Directeur Général", "Chef de département Génie informatique"]
             }
         ];
 
@@ -231,12 +245,13 @@
         let score = 0;
         let isAnswered = false;
 
-        const personPhoto = document.getElementById('personPhoto');
         const personName = document.getElementById('personName');
         const optionsContainer = document.getElementById('optionsContainer');
         const scoreElement = document.getElementById('score');
         const feedbackMessage = document.getElementById('feedbackMessage');
         const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+        const correctSound = document.getElementById('correctSound');
+        const incorrectSound = document.getElementById('incorrectSound');
 
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -256,9 +271,8 @@
             nextQuestionBtn.classList.remove('next-btn-pulse');
             nextQuestionBtn.classList.add('opacity-0', 'pointer-events-none');
             optionsContainer.innerHTML = '';
-            
+
             const currentPerson = people[currentPersonIndex];
-            personPhoto.src = currentPerson.photo;
             personName.textContent = currentPerson.name;
 
             shuffleArray(currentPerson.options);
@@ -282,6 +296,7 @@
                 button.classList.add('correct');
                 feedbackMessage.textContent = "Correct ! 🎉";
                 feedbackMessage.style.color = '#16a34a';
+                correctSound.play();
             } else {
                 button.classList.add('incorrect');
                 const correctButton = Array.from(optionsContainer.children).find(btn => btn.textContent === correctAnswer);
@@ -290,6 +305,7 @@
                 }
                 feedbackMessage.textContent = `Faux. La bonne réponse était : ${correctAnswer}`;
                 feedbackMessage.style.color = '#dc2626';
+                incorrectSound.play();
             }
 
             feedbackMessage.classList.add('show');
@@ -304,10 +320,9 @@
         }
 
         function endGame() {
-            personPhoto.src = "https://placehold.co/150x150/4f46e5/ffffff?text=Fin";
             personName.textContent = "Partie terminée !";
             optionsContainer.innerHTML = '';
-            
+
             // Calculate score percentage
             const percentage = (score / people.length) * 100;
             let message = `Votre score final est de ${score} sur ${people.length}.`;
@@ -343,4 +358,5 @@
         loadQuestion();
     </script>
 </body>
+
 </html>
