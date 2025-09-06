@@ -2,364 +2,391 @@
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz de l'Administration de ISI</title>
-    <!-- Chargement de Tailwind CSS pour un style moderne et réactif -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #a5b4fc 0%, #d8b4fe 100%);
-            color: #1a202c;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 1rem;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de l'Administration de ISI</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #a5b4fc 0%, #d8b4fe 100%);
+            color: #1a202c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
 
-        /* Style personnalisé pour les cartes de quiz */
-        .quiz-card {
-            background-color: white;
-            border-radius: 2rem;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-            max-width: 600px;
-            width: 100%;
-            padding: 2.5rem;
-            text-align: center;
-            animation: fadeIn 0.8s ease-out;
-            border: 1px solid #e2e8f0;
-            position: relative;
-            overflow: hidden;
-        }
+        /* Style personnalisé pour les cartes de quiz */
+        .quiz-card {
+            background-color: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            padding: 2.5rem;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+            border: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+        }
 
-        .quiz-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
-            opacity: 0.6;
-            pointer-events: none;
-        }
+        .quiz-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            opacity: 0.6;
+            pointer-events: none;
+        }
 
-        .option-button {
-            transition: all 0.3s ease;
-            transform: scale(1);
-            background: linear-gradient(145deg, #e2e8f0, #f8fafc);
-            color: #4a5568;
-            border: none;
-        }
+        .option-button {
+            transition: all 0.3s ease;
+            transform: scale(1);
+            background: linear-gradient(145deg, #e2e8f0, #f8fafc);
+            color: #4a5568;
+            border: none;
+        }
 
-        .option-button:hover:not(.correct):not(.incorrect) {
-            transform: scale(1.03);
-            background: linear-gradient(145deg, #d1d8e0, #e9eef5);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
+        .option-button:hover:not(.correct):not(.incorrect) {
+            transform: scale(1.03);
+            background: linear-gradient(145deg, #d1d8e0, #e9eef5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
 
-        .option-button.correct {
-            background: linear-gradient(145deg, #4ade80, #16a34a);
-            color: white;
-            animation: popAndPulse 0.6s forwards;
-            font-weight: 600;
-            box-shadow: 0 0 40px rgba(74, 222, 128, 0.7);
-        }
+        .option-button.correct {
+            background: linear-gradient(145deg, #4ade80, #16a34a);
+            color: white;
+            animation: popAndPulse 0.6s forwards;
+            font-weight: 600;
+            box-shadow: 0 0 40px rgba(74, 222, 128, 0.7);
+        }
 
-        .option-button.incorrect {
-            background: linear-gradient(145deg, #fca5a5, #ef4444);
-            color: white;
-            animation: shake 0.5s forwards;
-            font-weight: 600;
-            box-shadow: 0 4px 20px rgba(252, 165, 165, 0.4);
-        }
+        .option-button.incorrect {
+            background: linear-gradient(145deg, #fca5a5, #ef4444);
+            color: white;
+            animation: shake 0.5s forwards;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(252, 165, 165, 0.4);
+        }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-        @keyframes popAndPulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
-            }
+        @keyframes popAndPulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+            }
 
-            50% {
-                transform: scale(1.08);
-                box-shadow: 0 0 60px rgba(74, 222, 128, 0.9);
-            }
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 0 60px rgba(74, 222, 128, 0.9);
+            }
 
-            100% {
-                transform: scale(1.05);
-                box-shadow: 0 0 40px rgba(74, 222, 128, 0.7);
-            }
-        }
+            100% {
+                transform: scale(1.05);
+                box-shadow: 0 0 40px rgba(74, 222, 128, 0.7);
+            }
+        }
 
-        @keyframes shake {
+        @keyframes shake {
 
-            0%,
-            100% {
-                transform: translateX(0);
-            }
+            0%,
+            100% {
+                transform: translateX(0);
+            }
 
-            20%,
-            60% {
-                transform: translateX(-8px);
-            }
+            20%,
+            60% {
+                transform: translateX(-8px);
+            }
 
-            40%,
-            80% {
-                transform: translateX(8px);
-            }
-        }
+            40%,
+            80% {
+                transform: translateX(8px);
+            }
+        }
 
-        /* Message de feedback */
-        #feedbackMessage {
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
+        /* Message de feedback */
+        #feedbackMessage {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
 
-        #feedbackMessage.show {
-            opacity: 1;
-        }
+        #feedbackMessage.show {
+            opacity: 1;
+        }
 
-        .next-btn-pulse {
-            animation: pulse-btn 1.5s infinite;
-        }
+        .next-btn-pulse {
+            animation: pulse-btn 1.5s infinite;
+        }
 
-        @keyframes pulse-btn {
+        @keyframes pulse-btn {
 
-            0%,
-            100% {
-                transform: scale(1);
-            }
+            0%,
+            100% {
+                transform: scale(1);
+            }
 
-            50% {
-                transform: scale(1.05);
-            }
-        }
-    </style>
+            50% {
+                transform: scale(1.05);
+            }
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100 text-gray-800">
 
-    <div id="game-container" class="quiz-card">
-        <h1 class="text-3xl font-extrabold mb-6 text-gray-900">Quiz de l'Administration de ISI</h1>
-
-        <!-- Nom du membre -->
-        <h2 id="personName" class="text-2xl font-bold mb-4 text-gray-800"></h2>
-
-        <!-- Conteneur pour les options de rôle -->
-        <div id="optionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Les boutons seront générés ici par le JS -->
-        </div>
-
-        <!-- Section du score et du message de feedback -->
-        <div class="mt-8">
-            <p class="text-xl font-semibold text-gray-700">
-                Score: <span id="score" class="text-blue-600 font-extrabold">0</span>
-            </p>
-            <p id="feedbackMessage" class="text-lg font-bold mt-4"></p>
-        </div>
-
-        <!-- Bouton pour passer à la question suivante ou rejouer -->
-        <button id="nextQuestionBtn"
-            class="mt-6 bg-blue-600 text-white font-bold py-3 px-6 rounded-full opacity-0 pointer-events-none transition-opacity duration-300 transform hover:scale-105">
-            Suivant
-        </button>
+    <div id="pin-container" class="quiz-card">
+        <h1 class="text-3xl font-extrabold mb-6 text-gray-900">Entrez le code PIN</h1>
+        <p class="text-gray-600 mb-4">Codes valides : 1234, 5244, 8567</p>
+        <input type="password" id="pin-input" class="w-full text-center text-2xl font-bold py-3 px-4 rounded-xl border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition-colors duration-200" maxlength="4" placeholder="••••">
+        <p id="pin-error" class="text-red-500 font-semibold mt-2 hidden">Code PIN incorrect. Veuillez réessayer.</p>
+        <button id="pin-submit-btn" class="mt-6 w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition-transform transform hover:scale-105">Valider</button>
     </div>
 
-    <!-- Audio pour les effets sonores -->
-    <audio id="correctSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
-    <audio id="incorrectSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-        preload="auto"></audio>
+    <div id="game-container" class="quiz-card hidden">
+        <h1 class="text-3xl font-extrabold mb-6 text-gray-900">Quiz de l'Administration de ISI</h1>
 
-    <script>
-        const people = [
-            {
-                name: "M. Abdou SAMBÉ",
-                role: "Président Directeur Général (PDG)",
-                options: ["Président Directeur Général (PDG)", "Directeur Général", "Directrice Pédagogique"]
-            },
-            {
-                name: "M. Thierno SAMBÉ",
-                role: "Directeur Général",
-                options: ["Directeur Général", "Chef de département Réseaux & Systèmes", "Président Directeur Général (PDG)"]
-            },
-            {
-                name: "Mme Mané DIOP",
-                role: "Directrice Administrative et Financière",
-                options: ["Directrice Administrative et Financière", "Secrétaire du chef du département IA", "Directrice des Etudes"]
-            },
-            {
-                name: "Mme Aissatou G. DIOMBERA",
-                role: "Directrice Pédagogique",
-                options: ["Directrice Pédagogique", "Directeur Général", "Directrice Administrative et Financière"]
-            },
-            {
-                name: "M. El Hadji Mor DIAW",
-                role: "Chef de département Génie informatique",
-                options: ["Chef de département Génie informatique", "Chef de département Réseaux & Systèmes", "Chef de département IA & Ingénierie de données"]
-            },
-            {
-                name: "Dr Latyr NDIAYE",
-                role: "Chef de département Réseaux & Systèmes",
-                options: ["Chef de département Réseaux & Systèmes", "Directeur Général", "Chef de département Génie informatique"]
-            },
-            {
-                name: "M. Ibrahima SY",
-                role: "Chef de département IA & Ingénierie de données",
-                options: ["Chef de département IA & Ingénierie de données", "Directrice Pédagogique", "Chef de département Réseaux & Systèmes"]
-            },
-            {
-                name: "Ramatoulaye",
-                role: "Secrétaire du chef du département réseaux et systèmes",
-                options: ["Secrétaire du chef du département réseaux et systèmes", "Secrétaire du chef du département IA", "Directrice des Etudes"]
-            },
-            {
-                name: "Dieynaba",
-                role: "Secrétaire du chef du département IA",
-                options: ["Secrétaire du chef du département IA", "Directrice Administrative et Financière", "Président Directeur Général (PDG)"]
-            },
-            {
-                name: "Aissatou Diaby GASSAMA",
-                role: "Directrice des Etudes",
-                options: ["Directrice des Etudes", "Directeur Général", "Chef de département Génie informatique"]
-            }
-        ];
+                <h2 id="personName" class="text-2xl font-bold mb-4 text-gray-800"></h2>
 
-        let currentPersonIndex = 0;
-        let score = 0;
-        let isAnswered = false;
+                <div id="optionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    </div>
 
-        const personName = document.getElementById('personName');
-        const optionsContainer = document.getElementById('optionsContainer');
-        const scoreElement = document.getElementById('score');
-        const feedbackMessage = document.getElementById('feedbackMessage');
-        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
-        const correctSound = document.getElementById('correctSound');
-        const incorrectSound = document.getElementById('incorrectSound');
+                <div class="mt-8">
+            <p class="text-xl font-semibold text-gray-700">
+                Score: <span id="score" class="text-blue-600 font-extrabold">0</span>
+            </p>
+            <p id="feedbackMessage" class="text-lg font-bold mt-4"></p>
+        </div>
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
+                <button id="nextQuestionBtn"
+            class="mt-6 bg-blue-600 text-white font-bold py-3 px-6 rounded-full opacity-0 pointer-events-none transition-opacity duration-300 transform hover:scale-105">
+            Suivant
+        </button>
+    </div>
 
-        function loadQuestion() {
-            if (currentPersonIndex >= people.length) {
-                endGame();
-                return;
-            }
+        <audio id="correctSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+    <audio id="incorrectSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+        preload="auto"></audio>
 
-            isAnswered = false;
-            feedbackMessage.classList.remove('show');
-            nextQuestionBtn.classList.remove('next-btn-pulse');
-            nextQuestionBtn.classList.add('opacity-0', 'pointer-events-none');
-            optionsContainer.innerHTML = '';
+    <script>
+        const people = [
+            {
+                name: "M. Abdou SAMBÉ",
+                role: "Président Directeur Général (PDG)",
+                options: ["Président Directeur Général (PDG)", "Directeur Général", "Directrice Pédagogique"]
+            },
+            {
+                name: "M. Thierno SAMBÉ",
+                role: "Directeur Général",
+                options: ["Directeur Général", "Chef de département Réseaux & Systèmes", "Président Directeur Général (PDG)"]
+            },
+            {
+                name: "Mme Mané DIOP",
+                role: "Directrice Administrative et Financière",
+                options: ["Directrice Administrative et Financière", "Secrétaire du chef du département IA", "Directrice des Etudes"]
+            },
+            {
+                name: "Mme Aissatou G. DIOMBERA",
+                role: "Directrice Pédagogique",
+                options: ["Directrice Pédagogique", "Directeur Général", "Directrice Administrative et Financière"]
+            },
+            {
+                name: "M. El Hadji Mor DIAW",
+                role: "Chef de département Génie informatique",
+                options: ["Chef de département Génie informatique", "Chef de département Réseaux & Systèmes", "Chef de département IA & Ingénierie de données"]
+            },
+            {
+                name: "Dr Latyr NDIAYE",
+                role: "Chef de département Réseaux & Systèmes",
+                options: ["Chef de département Réseaux & Systèmes", "Directeur Général", "Chef de département Génie informatique"]
+            },
+            {
+                name: "M. Ibrahima SY",
+                role: "Chef de département IA & Ingénierie de données",
+                options: ["Chef de département IA & Ingénierie de données", "Directrice Pédagogique", "Chef de département Réseaux & Systèmes"]
+            },
+            {
+                name: "Ramatoulaye",
+                role: "Secrétaire du chef du département réseaux et systèmes",
+                options: ["Secrétaire du chef du département réseaux et systèmes", "Secrétaire du chef du département IA", "Directrice des Etudes"]
+            },
+            {
+                name: "Dieynaba",
+                role: "Secrétaire du chef du département IA",
+                options: ["Secrétaire du chef du département IA", "Directrice Administrative et Financière", "Président Directeur Général (PDG)"]
+            },
+            {
+                name: "Aissatou Diaby GASSAMA",
+                role: "Directrice des Etudes",
+                options: ["Directrice des Etudes", "Directeur Général", "Chef de département Génie informatique"]
+            }
+        ];
 
-            const currentPerson = people[currentPersonIndex];
-            personName.textContent = currentPerson.name;
+        let currentPersonIndex = 0;
+        let score = 0;
+        let isAnswered = false;
 
-            shuffleArray(currentPerson.options);
+        const personName = document.getElementById('personName');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const scoreElement = document.getElementById('score');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+        const correctSound = document.getElementById('correctSound');
+        const incorrectSound = document.getElementById('incorrectSound');
 
-            currentPerson.options.forEach(option => {
-                const button = document.createElement('button');
-                button.textContent = option;
-                button.classList.add('option-button', 'font-semibold', 'py-3', 'px-6', 'rounded-xl', 'shadow-md');
-                button.addEventListener('click', () => handleAnswer(button, option, currentPerson.role));
-                optionsContainer.appendChild(button);
-            });
-        }
+        // Ajout des constantes pour la nouvelle section de code PIN
+        const validPins = ['1234', '5244', '8567'];
+        const pinContainer = document.getElementById('pin-container');
+        const pinInput = document.getElementById('pin-input');
+        const pinSubmitBtn = document.getElementById('pin-submit-btn');
+        const pinError = document.getElementById('pin-error');
+        const gameContainer = document.getElementById('game-container');
 
-        function handleAnswer(button, selectedOption, correctAnswer) {
-            if (isAnswered) return;
-            isAnswered = true;
 
-            if (selectedOption === correctAnswer) {
-                score++;
-                scoreElement.textContent = score;
-                button.classList.add('correct');
-                feedbackMessage.textContent = "Correct ! 🎉";
-                feedbackMessage.style.color = '#16a34a';
-                correctSound.play();
-            } else {
-                button.classList.add('incorrect');
-                const correctButton = Array.from(optionsContainer.children).find(btn => btn.textContent === correctAnswer);
-                if (correctButton) {
-                    correctButton.classList.add('correct');
-                }
-                feedbackMessage.textContent = `Faux. La bonne réponse était : ${correctAnswer}`;
-                feedbackMessage.style.color = '#dc2626';
-                incorrectSound.play();
-            }
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
 
-            feedbackMessage.classList.add('show');
-            nextQuestionBtn.classList.remove('opacity-0', 'pointer-events-none');
-            nextQuestionBtn.classList.add('next-btn-pulse');
-            nextQuestionBtn.textContent = (currentPersonIndex === people.length - 1) ? 'Rejouer' : 'Suivant';
-        }
+        function loadQuestion() {
+            if (currentPersonIndex >= people.length) {
+                endGame();
+                return;
+            }
 
-        function nextQuestion() {
-            currentPersonIndex++;
-            loadQuestion();
-        }
+            isAnswered = false;
+            feedbackMessage.classList.remove('show');
+            nextQuestionBtn.classList.remove('next-btn-pulse');
+            nextQuestionBtn.classList.add('opacity-0', 'pointer-events-none');
+            optionsContainer.innerHTML = '';
 
-        function endGame() {
-            personName.textContent = "Partie terminée !";
-            optionsContainer.innerHTML = '';
+            const currentPerson = people[currentPersonIndex];
+            personName.textContent = currentPerson.name;
 
-            // Calculate score percentage
-            const percentage = (score / people.length) * 100;
-            let message = `Votre score final est de ${score} sur ${people.length}.`;
+            shuffleArray(currentPerson.options);
 
-            if (percentage >= 80) {
-                message += " Tu maîtrise parfaitement l'administration ! Bravo ! 🎉✨";
-                feedbackMessage.style.color = '#3b82f6';
-            } else if (percentage >= 50) {
-                message += " Bonne performance ! Continuez à t'entraîner pour connaître tous les membres sinon tu iras aux rattrapages 😋";
-                feedbackMessage.style.color = '#3b82f6';
-            } else {
-                message += " Pas de panique ! C'est un bon début. Continue à jouer pour mieux mémoriser les rôles mais en vrai il faut avoir honte 😅";
-                feedbackMessage.style.color = '#3b82f6';
-            }
+            currentPerson.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option-button', 'font-semibold', 'py-3', 'px-6', 'rounded-xl', 'shadow-md');
+                button.addEventListener('click', () => handleAnswer(button, option, currentPerson.role));
+                optionsContainer.appendChild(button);
+            });
+        }
 
-            feedbackMessage.textContent = message;
-            feedbackMessage.classList.add('show');
-            nextQuestionBtn.textContent = 'Rejouer';
-            currentPersonIndex = -1; // Reset for next play
-        }
+        function handleAnswer(button, selectedOption, correctAnswer) {
+            if (isAnswered) return;
+            isAnswered = true;
 
-        nextQuestionBtn.addEventListener('click', () => {
-            if (currentPersonIndex === -1) {
-                score = 0;
-                scoreElement.textContent = score;
-                currentPersonIndex = 0;
+            if (selectedOption === correctAnswer) {
+                score++;
+                scoreElement.textContent = score;
+                button.classList.add('correct');
+                feedbackMessage.textContent = "Correct ! 🎉";
+                feedbackMessage.style.color = '#16a34a';
+                correctSound.play();
+            } else {
+                button.classList.add('incorrect');
+                const correctButton = Array.from(optionsContainer.children).find(btn => btn.textContent === correctAnswer);
+                if (correctButton) {
+                    correctButton.classList.add('correct');
+                }
+                feedbackMessage.textContent = `Faux. La bonne réponse était : ${correctAnswer}`;
+                feedbackMessage.style.color = '#dc2626';
+                incorrectSound.play();
+            }
+
+            feedbackMessage.classList.add('show');
+            nextQuestionBtn.classList.remove('opacity-0', 'pointer-events-none');
+            nextQuestionBtn.classList.add('next-btn-pulse');
+            nextQuestionBtn.textContent = (currentPersonIndex === people.length - 1) ? 'Rejouer' : 'Suivant';
+        }
+
+        function nextQuestion() {
+            currentPersonIndex++;
+            loadQuestion();
+        }
+
+        function endGame() {
+            personName.textContent = "Partie terminée !";
+            optionsContainer.innerHTML = '';
+
+            // Calculate score percentage
+            const percentage = (score / people.length) * 100;
+            let message = `Votre score final est de ${score} sur ${people.length}.`;
+
+            if (percentage >= 80) {
+                message += " Tu maîtrise parfaitement l'administration ! Bravo ! 🎉✨";
+                feedbackMessage.style.color = '#3b82f6';
+            } else if (percentage >= 50) {
+                message += " Bonne performance ! Continuez à t'entraîner pour connaître tous les membres sinon tu iras aux rattrapages 😋";
+                feedbackMessage.style.color = '#3b82f6';
+            } else {
+                message += " Pas de panique ! C'est un bon début. Continue à jouer pour mieux mémoriser les rôles mais en vrai il faut avoir honte 😅";
+                feedbackMessage.style.color = '#3b82f6';
+            }
+
+            feedbackMessage.textContent = message;
+            feedbackMessage.classList.add('show');
+            nextQuestionBtn.textContent = 'Rejouer';
+            currentPersonIndex = -1; // Reset for next play
+        }
+
+        nextQuestionBtn.addEventListener('click', () => {
+            if (currentPersonIndex === -1) {
+                score = 0;
+                scoreElement.textContent = score;
+                currentPersonIndex = 0;
+                shuffleArray(people);
+            }
+            nextQuestion();
+        });
+        
+        // Ajout de la logique de vérification du code PIN
+        pinSubmitBtn.addEventListener('click', () => {
+            const enteredPin = pinInput.value;
+            if (validPins.includes(enteredPin)) {
+                pinError.classList.add('hidden');
+                pinContainer.classList.add('hidden');
+                gameContainer.classList.remove('hidden');
                 shuffleArray(people);
+                loadQuestion();
+            } else {
+                pinError.classList.remove('hidden');
+                pinInput.value = '';
             }
-            nextQuestion();
         });
 
-        shuffleArray(people);
-        loadQuestion();
-    </script>
+        // Gérer la validation avec la touche "Entrée"
+        pinInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                pinSubmitBtn.click();
+            }
+        });
+
+    </script>
 </body>
 
 </html>
-
-
-
