@@ -159,17 +159,8 @@
 
 <body class="bg-gray-100 text-gray-800">
 
-    <!-- Conteneur pour la saisie du code PIN -->
-    <div id="pin-container" class="quiz-card">
-        <h1 class="text-3xl font-extrabold mb-6 text-gray-900">Entrez le code PIN</h1>
-        <p class="text-gray-600 mb-4">Codes valides : 1234, 5244, 8567</p>
-        <input type="password" id="pin-input" class="w-full text-center text-2xl font-bold py-3 px-4 rounded-xl border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition-colors duration-200" maxlength="4" placeholder="••••">
-        <p id="pin-error" class="text-red-500 font-semibold mt-2 hidden">Code PIN incorrect. Veuillez réessayer.</p>
-        <button id="pin-submit-btn" class="mt-6 w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition-transform transform hover:scale-105">Valider</button>
-    </div>
-
-    <!-- Conteneur du quiz, initialement caché -->
-    <div id="game-container" class="quiz-card hidden">
+    <!-- Conteneur du quiz, visible par défaut -->
+    <div id="game-container" class="quiz-card quiz-fade-in">
         <div class="relative pt-1">
             <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-purple-200">
                 <div id="progressBar" style="width: 0%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-500 transition-all duration-300"></div>
@@ -334,11 +325,6 @@
         const nextQuestionBtn = document.getElementById('nextQuestionBtn');
         const progressBar = document.getElementById('progressBar');
 
-        const validPins = ['1234', '5244', '8567'];
-        const pinContainer = document.getElementById('pin-container');
-        const pinInput = document.getElementById('pin-input');
-        const pinSubmitBtn = document.getElementById('pin-submit-btn');
-        const pinError = document.getElementById('pin-error');
         const gameContainer = document.getElementById('game-container');
         const leaderboardContainer = document.getElementById('leaderboard-container');
         const leaderboardElement = document.getElementById('leaderboard');
@@ -540,28 +526,13 @@
             resetGame();
         });
 
-        pinSubmitBtn.addEventListener('click', () => {
-            const enteredPin = pinInput.value;
-            if (validPins.includes(enteredPin)) {
-                pinError.classList.add('hidden');
-                pinContainer.classList.add('hidden');
-                gameContainer.classList.remove('hidden');
-                gameContainer.classList.add('quiz-fade-in');
-                shuffleArray(shuffledPeople);
-                signIn().then(() => {
-                    loadQuestion();
-                });
-            } else {
-                pinError.classList.remove('hidden');
-                pinInput.value = '';
-            }
-        });
-
-        pinInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                pinSubmitBtn.click();
-            }
-        });
+        // Démarrage du jeu au chargement de la page
+        window.onload = function() {
+            shuffleArray(shuffledPeople);
+            signIn().then(() => {
+                loadQuestion();
+            });
+        };
     </script>
 </body>
 
