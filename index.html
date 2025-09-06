@@ -162,7 +162,7 @@
     <!-- Conteneur pour la saisie du code PIN -->
     <div id="pin-container" class="quiz-card">
         <h1 class="text-3xl font-extrabold mb-6 text-gray-900">Entrez le code PIN</h1>
-        <p class="text-gray-600 mb-4">Code valide 1234.</p>
+        <p class="text-gray-600 mb-4">Codes valides : 1234</p>
         <input type="password" id="pin-input" class="w-full text-center text-2xl font-bold py-3 px-4 rounded-xl border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition-colors duration-200" maxlength="4" placeholder="••••">
         <p id="pin-error" class="text-red-500 font-semibold mt-2 hidden">Code PIN incorrect. Veuillez réessayer.</p>
         <button id="pin-submit-btn" class="mt-6 w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition-transform transform hover:scale-105">Valider</button>
@@ -566,4 +566,571 @@
 </body>
 
 </html>
+<!DOCTYPE html>
+<html lang="fr">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de l'Administration de ISI</title>
+    <!-- Chargement de Tailwind CSS pour un style moderne et réactif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #a5b4fc 0%, #d8b4fe 100%);
+            color: #1a202c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        /* Style personnalisé pour les cartes de quiz */
+        .quiz-card {
+            background-color: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            padding: 2.5rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .option-button {
+            transition: all 0.3s ease;
+            transform: scale(1);
+            background: linear-gradient(145deg, #e2e8f0, #f8fafc);
+            color: #4a5568;
+            border: none;
+        }
+
+        .option-button:hover:not(.correct):not(.incorrect) {
+            transform: scale(1.03);
+            background: linear-gradient(145deg, #d1d8e0, #e9eef5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .option-button.correct {
+            background: linear-gradient(145deg, #4ade80, #16a34a);
+            color: white;
+            animation: popAndPulse 0.6s forwards;
+            font-weight: 600;
+            box-shadow: 0 0 40px rgba(74, 222, 128, 0.7);
+        }
+
+        .option-button.incorrect {
+            background: linear-gradient(145deg, #fca5a5, #ef4444);
+            color: white;
+            animation: shake 0.5s forwards;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(252, 165, 165, 0.4);
+        }
+
+        @keyframes quiz-enter {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .quiz-fade-in {
+            animation: quiz-enter 0.8s ease-out;
+        }
+
+        @keyframes popAndPulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+            }
+
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 0 60px rgba(74, 222, 128, 0.9);
+            }
+
+            100% {
+                transform: scale(1.05);
+                box-shadow: 0 0 40px rgba(74, 222, 128, 0.7);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-8px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(8px);
+            }
+        }
+
+        /* Message de feedback */
+        #feedbackMessage {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #feedbackMessage.show {
+            opacity: 1;
+        }
+
+        .next-btn-pulse {
+            animation: pulse-btn 1.5s infinite;
+        }
+
+        @keyframes pulse-btn {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Conteneur pour la saisie du code PIN -->
+    <div id="pin-container" class="quiz-card">
+        <h1 class="text-3xl font-extrabold mb-6 text-gray-900">Entrez le code PIN</h1>
+        <p class="text-gray-600 mb-4">Codes valides : 1234, 5244, 8567</p>
+        <input type="password" id="pin-input" class="w-full text-center text-2xl font-bold py-3 px-4 rounded-xl border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition-colors duration-200" maxlength="4" placeholder="••••">
+        <p id="pin-error" class="text-red-500 font-semibold mt-2 hidden">Code PIN incorrect. Veuillez réessayer.</p>
+        <button id="pin-submit-btn" class="mt-6 w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition-transform transform hover:scale-105">Valider</button>
+    </div>
+
+    <!-- Conteneur du quiz, initialement caché -->
+    <div id="game-container" class="quiz-card hidden">
+        <div class="relative pt-1">
+            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-purple-200">
+                <div id="progressBar" style="width: 0%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-500 transition-all duration-300"></div>
+            </div>
+        </div>
+        <h1 class="text-3xl font-extrabold mb-6 text-gray-900">Quiz de l'Administration de ISI</h1>
+        <div class="flex flex-col items-center mb-4">
+            <img id="personImage" src="https://placehold.co/128x128/a5b4fc/d8b4fe?text=ISI" alt="Photo de profil" class="w-32 h-32 rounded-full mb-4 object-cover border-4 border-gray-200 shadow-lg">
+            <h2 id="personName" class="text-2xl font-bold mb-2 text-gray-800"></h2>
+        </div>
+
+        <div id="optionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Les boutons seront générés ici par le JS -->
+        </div>
+
+        <div class="mt-8">
+            <p class="text-xl font-semibold text-gray-700">
+                Score: <span id="score" class="text-blue-600 font-extrabold">0</span>
+            </p>
+            <p id="feedbackMessage" class="text-lg font-bold mt-4"></p>
+        </div>
+
+        <button id="nextQuestionBtn"
+            class="mt-6 bg-blue-600 text-white font-bold py-3 px-6 rounded-full opacity-0 pointer-events-none transition-opacity duration-300 transform hover:scale-105">
+            Suivant
+        </button>
+    </div>
+
+    <!-- Conteneur du classement, initialement caché -->
+    <div id="leaderboard-container" class="quiz-card hidden">
+        <h1 class="text-3xl font-extrabold mb-6 text-gray-900">Classement</h1>
+        <div id="leaderboard" class="space-y-4 text-left">
+            <!-- Les scores seront affichés ici -->
+        </div>
+        <div id="loading" class="text-gray-500 font-semibold mt-4 hidden">Chargement du classement...</div>
+        <button id="playAgainBtn" class="mt-6 w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition-transform transform hover:scale-105">Rejouer</button>
+        <p class="mt-4 text-xs text-gray-500">
+            ID de session: <span id="userIdDisplay"></span>
+        </p>
+    </div>
+
+
+    <!-- Librairies Firebase et Tone.js -->
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // Définir le niveau de log pour le débogage de Firestore
+        setLogLevel('Debug');
+
+        // Variables globales fournies par l'environnement Canvas
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db, auth, userId;
+
+        // Initialisation de Firebase
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+        
+        // Connexion de l'utilisateur
+        async function signIn() {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Erreur de connexion Firebase:", error);
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userId = user.uid;
+                document.getElementById('userIdDisplay').textContent = userId;
+            } else {
+                userId = null;
+            }
+        });
+
+        // Données du quiz
+        const people = [
+            {
+                name: "M. Abdou SAMBÉ",
+                role: "Président Directeur Général (PDG)",
+                options: ["Président Directeur Général (PDG)", "Directeur Général", "Directrice Pédagogique"],
+                image: "https://placehold.co/128x128/a5b4fc/d8b4fe?text=AS"
+            },
+            {
+                name: "M. Thierno SAMBÉ",
+                role: "Directeur Général",
+                options: ["Directeur Général", "Chef de département Réseaux & Systèmes", "Président Directeur Général (PDG)"],
+                image: "https://placehold.co/128x128/a5b4fc/d8b4fe?text=TS"
+            },
+            {
+                name: "Mme Mané DIOP",
+                role: "Directrice Administrative et Financière",
+                options: ["Directrice Administrative et Financière", "Secrétaire du chef du département IA", "Directrice des Etudes"],
+                image: "https://placehold.co/128x128/a5b4fc/d8b4fe?text=MD"
+            },
+            {
+                name: "Mme Aissatou G. DIOMBERA",
+                role: "Directrice Pédagogique",
+                options: ["Directrice Pédagogique", "Directeur Général", "Directrice Administrative et Financière"],
+                image: "https://placehold.co/128x128/a5b4fc/d8b4fe?text=AGD"
+            },
+            {
+                name: "M. El Hadji Mor DIAW",
+                role: "Chef de département Génie informatique",
+                options: ["Chef de département Génie informatique", "Chef de département Réseaux & Systèmes", "Chef de département IA & Ingénierie de données"],
+                image: "https://placehold.co/128x128/a5b4fc/d8b4fe?text=EMD"
+            },
+            {
+                name: "Dr Latyr NDIAYE",
+                role: "Chef de département Réseaux & Systèmes",
+                options: ["Chef de département Réseaux & Systèmes", "Directeur Général", "Chef de département Génie informatique"],
+                image: "https://placehold.co/128x128/a5b4fc/d8b4fe?text=LN"
+            },
+            {
+                name: "M. Ibrahima SY",
+                role: "Chef de département IA & Ingénierie de données",
+                options: ["Chef de département IA & Ingénierie de données", "Directrice Pédagogique", "Chef de département Réseaux & Systèmes"],
+                image: "https://placehold.co/128x128/a5b4fc/d8b4fe?text=IS"
+            },
+            {
+                name: "Ramatoulaye",
+                role: "Secrétaire du chef du département réseaux et systèmes",
+                options: ["Secrétaire du chef du département réseaux et systèmes", "Secrétaire du chef du département IA", "Directrice des Etudes"],
+                image: "https://placehold.co/128x128/a5b4fc/d8b4fe?text=R"
+            },
+            {
+                name: "Dieynaba",
+                role: "Secrétaire du chef du département IA",
+                options: ["Secrétaire du chef du département IA", "Directrice Administrative et Financière", "Président Directeur Général (PDG)"],
+                image: "https://placehold.co/128x128/a5b4fc/d8b4fe?text=D"
+            },
+            {
+                name: "Aissatou Diaby GASSAMA",
+                role: "Directrice des Etudes",
+                options: ["Directrice des Etudes", "Directeur Général", "Chef de département Génie informatique"],
+                image: "https://placehold.co/128x128/a5b4fc/d8b4fe?text=ADG"
+            }
+        ];
+
+        let currentPersonIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+        let shuffledPeople = [...people];
+
+        const personName = document.getElementById('personName');
+        const personImage = document.getElementById('personImage');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const scoreElement = document.getElementById('score');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+        const progressBar = document.getElementById('progressBar');
+
+        const validPins = ['1234', '5244', '8567'];
+        const pinContainer = document.getElementById('pin-container');
+        const pinInput = document.getElementById('pin-input');
+        const pinSubmitBtn = document.getElementById('pin-submit-btn');
+        const pinError = document.getElementById('pin-error');
+        const gameContainer = document.getElementById('game-container');
+        const leaderboardContainer = document.getElementById('leaderboard-container');
+        const leaderboardElement = document.getElementById('leaderboard');
+        const loadingElement = document.getElementById('loading');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+
+        const correctSynth = new Tone.Synth({
+            oscillator: { type: "square" },
+            envelope: {
+                attack: 0.05,
+                decay: 0.2,
+                sustain: 0.1,
+                release: 0.3
+            }
+        }).toDestination();
+        const incorrectSynth = new Tone.Synth({
+            oscillator: { type: "triangle" },
+            envelope: {
+                attack: 0.01,
+                decay: 0.1,
+                sustain: 0,
+                release: 0.1
+            }
+        }).toDestination();
+
+        const correctFanfare = [
+            { note: "G4", time: "0" },
+            { note: "C5", time: "0.1" },
+            { note: "E5", time: "0.2" },
+            { note: "G5", time: "0.3" }
+        ];
+
+        function playCorrectSound() {
+            correctFanfare.forEach(noteEvent => {
+                correctSynth.triggerAttackRelease(noteEvent.note, '8n', Tone.now() + parseFloat(noteEvent.time));
+            });
+        }
+
+        function playIncorrectSound() {
+            incorrectSynth.triggerAttackRelease("C3", "16n");
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = (currentPersonIndex / shuffledPeople.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function loadQuestion() {
+            if (currentPersonIndex >= shuffledPeople.length) {
+                endGame();
+                return;
+            }
+
+            isAnswered = false;
+            feedbackMessage.classList.remove('show');
+            nextQuestionBtn.classList.remove('next-btn-pulse');
+            nextQuestionBtn.classList.add('opacity-0', 'pointer-events-none');
+            optionsContainer.innerHTML = '';
+            updateProgressBar();
+
+            const currentPerson = shuffledPeople[currentPersonIndex];
+            personName.textContent = currentPerson.name;
+            personImage.src = currentPerson.image;
+
+            shuffleArray(currentPerson.options);
+
+            currentPerson.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option-button', 'font-semibold', 'py-3', 'px-6', 'rounded-xl', 'shadow-md');
+                button.addEventListener('click', () => handleAnswer(button, option, currentPerson.role));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function handleAnswer(button, selectedOption, correctAnswer) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            if (selectedOption === correctAnswer) {
+                score++;
+                scoreElement.textContent = score;
+                button.classList.add('correct');
+                feedbackMessage.textContent = "Correct ! 🎉";
+                feedbackMessage.style.color = '#16a34a';
+                playCorrectSound();
+            } else {
+                button.classList.add('incorrect');
+                const correctButton = Array.from(optionsContainer.children).find(btn => btn.textContent === correctAnswer);
+                if (correctButton) {
+                    correctButton.classList.add('correct');
+                }
+                feedbackMessage.textContent = `Faux. La bonne réponse était : ${correctAnswer}`;
+                feedbackMessage.style.color = '#dc2626';
+                playIncorrectSound();
+            }
+
+            feedbackMessage.classList.add('show');
+            nextQuestionBtn.classList.remove('opacity-0', 'pointer-events-none');
+            nextQuestionBtn.classList.add('next-btn-pulse');
+            nextQuestionBtn.textContent = (currentPersonIndex === shuffledPeople.length - 1) ? 'Voir le classement' : 'Suivant';
+        }
+
+        async function saveScore(score, userId) {
+            try {
+                if (!userId) {
+                    console.error("Impossible de sauvegarder le score : utilisateur non authentifié.");
+                    return;
+                }
+                const scoresCollection = collection(db, `artifacts/${appId}/public/data/scores`);
+                await addDoc(scoresCollection, {
+                    score: score,
+                    userId: userId,
+                    createdAt: new Date()
+                });
+            } catch (error) {
+                console.error("Erreur lors de la sauvegarde du score:", error);
+            }
+        }
+
+        async function fetchLeaderboard() {
+            loadingElement.classList.remove('hidden');
+            leaderboardElement.innerHTML = '';
+            try {
+                const scoresCollection = collection(db, `artifacts/${appId}/public/data/scores`);
+                // Nous utilisons orderBy sur un seul champ pour éviter les erreurs d'index.
+                const q = query(scoresCollection, orderBy("score", "desc"), limit(10));
+                
+                // onSnapshot pour un classement en temps réel
+                onSnapshot(q, (snapshot) => {
+                    const scores = [];
+                    snapshot.forEach((doc) => {
+                        scores.push(doc.data());
+                    });
+                    
+                    // Tri en mémoire pour être sûr, si des règles de tri plus complexes étaient nécessaires
+                    scores.sort((a, b) => b.score - a.score);
+                    
+                    leaderboardElement.innerHTML = '';
+                    if (scores.length === 0) {
+                        leaderboardElement.innerHTML = '<p class="text-gray-500 text-center">Aucun score pour le moment. Soyez le premier !</p>';
+                    } else {
+                        scores.forEach((s, index) => {
+                            const scoreItem = document.createElement('div');
+                            scoreItem.classList.add('flex', 'justify-between', 'items-center', 'py-2', 'px-4', 'bg-gray-100', 'rounded-lg');
+                            scoreItem.innerHTML = `
+                                <span class="font-bold text-lg">${index + 1}.</span>
+                                <span class="text-gray-700">${s.userId.substring(0, 8)}...</span>
+                                <span class="font-bold text-blue-600">${s.score} points</span>
+                            `;
+                            leaderboardElement.appendChild(scoreItem);
+                        });
+                    }
+                    loadingElement.classList.add('hidden');
+                });
+            } catch (error) {
+                console.error("Erreur lors du chargement du classement:", error);
+                loadingElement.classList.add('hidden');
+                leaderboardElement.innerHTML = '<p class="text-red-500 text-center">Erreur de chargement du classement.</p>';
+            }
+        }
+
+        function endGame() {
+            gameContainer.classList.add('hidden');
+            leaderboardContainer.classList.remove('hidden');
+            leaderboardContainer.classList.add('quiz-fade-in');
+            saveScore(score, userId);
+            fetchLeaderboard();
+        }
+
+        function resetGame() {
+            score = 0;
+            currentPersonIndex = 0;
+            scoreElement.textContent = score;
+            shuffleArray(shuffledPeople);
+            leaderboardContainer.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+            gameContainer.classList.add('quiz-fade-in');
+            loadQuestion();
+        }
+
+        nextQuestionBtn.addEventListener('click', () => {
+            if (currentPersonIndex === shuffledPeople.length - 1) {
+                endGame();
+            } else {
+                currentPersonIndex++;
+                loadQuestion();
+            }
+        });
+
+        playAgainBtn.addEventListener('click', () => {
+            resetGame();
+        });
+
+        pinSubmitBtn.addEventListener('click', () => {
+            const enteredPin = pinInput.value;
+            if (validPins.includes(enteredPin)) {
+                pinError.classList.add('hidden');
+                pinContainer.classList.add('hidden');
+                gameContainer.classList.remove('hidden');
+                gameContainer.classList.add('quiz-fade-in');
+                shuffleArray(shuffledPeople);
+                signIn().then(() => {
+                    loadQuestion();
+                });
+            } else {
+                pinError.classList.remove('hidden');
+                pinInput.value = '';
+            }
+        });
+
+        pinInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                pinSubmitBtn.click();
+            }
+        });
+    </script>
+</body>
+
+</html>
