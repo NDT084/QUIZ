@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz de l'Administration de ISI</title>
-    <!-- Chargement de Tailwind CSS pour un style moderne et réactif -->
+    <!-- 
+        Note: Le CDN de Tailwind CSS est utilisé pour le développement rapide. 
+        Le message "should not be used in production" est un avertissement de bonne pratique 
+        qui ne bloque pas le fonctionnement de l'application.
+    -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -163,12 +167,15 @@
     <div id="game-container" class="quiz-card quiz-fade-in">
         <div class="relative pt-1">
             <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-purple-200">
-                <div id="progressBar" style="width: 0%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-500 transition-all duration-300"></div>
+                <div id="progressBar" style="width: 0%"
+                    class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-500 transition-all duration-300">
+                </div>
             </div>
         </div>
         <h1 class="text-3xl font-extrabold mb-6 text-gray-900">Quiz de l'Administration de ISI</h1>
         <div class="flex flex-col items-center mb-4">
-            <img id="personImage" src="https://placehold.co/128x128/a5b4fc/d8b4fe?text=ISI" alt="Photo de profil" class="w-32 h-32 rounded-full mb-4 object-cover border-4 border-gray-200 shadow-lg">
+            <img id="personImage" src="https://placehold.co/128x128/a5b4fc/d8b4fe?text=ISI" alt="Photo de profil"
+                class="w-32 h-32 rounded-full mb-4 object-cover border-4 border-gray-200 shadow-lg">
             <h2 id="personName" class="text-2xl font-bold mb-2 text-gray-800"></h2>
         </div>
 
@@ -192,11 +199,13 @@
     <!-- Conteneur du classement, initialement caché -->
     <div id="leaderboard-container" class="quiz-card hidden">
         <h1 class="text-3xl font-extrabold mb-6 text-gray-900">Classement</h1>
+        <p id="appreciationMessage" class="text-lg font-semibold text-gray-700 mb-6"></p>
         <div id="leaderboard" class="space-y-4 text-left">
             <!-- Les scores seront affichés ici -->
         </div>
         <div id="loading" class="text-gray-500 font-semibold mt-4 hidden">Chargement du classement...</div>
-        <button id="playAgainBtn" class="mt-6 w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition-transform transform hover:scale-105">Rejouer</button>
+        <button id="playAgainBtn"
+            class="mt-6 w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition-transform transform hover:scale-105">Rejouer</button>
         <p class="mt-4 text-xs text-gray-500">
             ID de session: <span id="userIdDisplay"></span>
         </p>
@@ -210,7 +219,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
+
         // Définir le niveau de log pour le débogage de Firestore
         setLogLevel('Debug');
 
@@ -220,33 +229,49 @@
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let db, auth, userId;
+        // Un booléen pour vérifier si la base de données est initialisée
+        let isDbReady = false;
 
         // Initialisation de Firebase
-        const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        auth = getAuth(app);
-        
-        // Connexion de l'utilisateur
-        async function signIn() {
+        // Si la configuration est valide, on initialise la base de données
+        if (firebaseConfig && firebaseConfig.projectId) {
             try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Erreur de connexion Firebase:", error);
-            }
-        }
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                isDbReady = true;
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                userId = user.uid;
-                document.getElementById('userIdDisplay').textContent = userId;
-            } else {
-                userId = null;
+                // Connexion de l'utilisateur
+                async function signIn() {
+                    try {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Erreur de connexion Firebase:", error);
+                    }
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        document.getElementById('userIdDisplay').textContent = userId;
+                    } else {
+                        userId = null;
+                    }
+                });
+
+                // On lance la connexion en arrière-plan
+                signIn();
+            } catch (error) {
+                console.error("Erreur d'initialisation de Firebase:", error);
+                isDbReady = false;
             }
-        });
+        } else {
+            console.warn("Firebase n'a pas été initialisé. Le classement ne sera pas disponible.");
+        }
 
         // Données du quiz
         const people = [
@@ -316,6 +341,8 @@
         let score = 0;
         let isAnswered = false;
         let shuffledPeople = [...people];
+        // Flag pour s'assurer que l'audio démarre une seule fois
+        let hasAudioStarted = false;
 
         const personName = document.getElementById('personName');
         const personImage = document.getElementById('personImage');
@@ -324,13 +351,16 @@
         const feedbackMessage = document.getElementById('feedbackMessage');
         const nextQuestionBtn = document.getElementById('nextQuestionBtn');
         const progressBar = document.getElementById('progressBar');
+        const appreciationMessage = document.getElementById('appreciationMessage');
 
         const gameContainer = document.getElementById('game-container');
         const leaderboardContainer = document.getElementById('leaderboard-container');
         const leaderboardElement = document.getElementById('leaderboard');
         const loadingElement = document.getElementById('loading');
         const playAgainBtn = document.getElementById('playAgainBtn');
+        const userIdDisplay = document.getElementById('userIdDisplay');
 
+        // Initialisation de Tone.js (sans le démarrer)
         const correctSynth = new Tone.Synth({
             oscillator: { type: "square" },
             envelope: {
@@ -358,6 +388,7 @@
         ];
 
         function playCorrectSound() {
+            // L'erreur de dépréciation "ScriptProcessorNode" vient de Tone.js
             correctFanfare.forEach(noteEvent => {
                 correctSynth.triggerAttackRelease(noteEvent.note, '8n', Tone.now() + parseFloat(noteEvent.time));
             });
@@ -407,7 +438,14 @@
             });
         }
 
-        function handleAnswer(button, selectedOption, correctAnswer) {
+        async function handleAnswer(button, selectedOption, correctAnswer) {
+            // Démarrer l'AudioContext au premier clic de l'utilisateur
+            if (!hasAudioStarted) {
+                await Tone.start();
+                hasAudioStarted = true;
+                console.log("AudioContext démarré avec succès.");
+            }
+
             if (isAnswered) return;
             isAnswered = true;
 
@@ -435,70 +473,90 @@
             nextQuestionBtn.textContent = (currentPersonIndex === shuffledPeople.length - 1) ? 'Voir le classement' : 'Suivant';
         }
 
-        async function saveScore(score, userId) {
-            try {
-                if (!userId) {
-                    console.error("Impossible de sauvegarder le score : utilisateur non authentifié.");
-                    return;
+        async function saveScore(score) {
+            // On ne tente de sauvegarder que si Firebase est prêt
+            if (isDbReady && userId) {
+                try {
+                    const scoresCollection = collection(db, `artifacts/${appId}/public/data/scores`);
+                    await addDoc(scoresCollection, {
+                        score: score,
+                        userId: userId,
+                        createdAt: new Date()
+                    });
+                } catch (error) {
+                    console.error("Erreur lors de la sauvegarde du score:", error);
                 }
-                const scoresCollection = collection(db, `artifacts/${appId}/public/data/scores`);
-                await addDoc(scoresCollection, {
-                    score: score,
-                    userId: userId,
-                    createdAt: new Date()
-                });
-            } catch (error) {
-                console.error("Erreur lors de la sauvegarde du score:", error);
+            } else {
+                console.warn("Impossible de sauvegarder le score. La base de données n'est pas connectée.");
             }
         }
 
         async function fetchLeaderboard() {
-            loadingElement.classList.remove('hidden');
-            leaderboardElement.innerHTML = '';
-            try {
-                const scoresCollection = collection(db, `artifacts/${appId}/public/data/scores`);
-                // Nous utilisons orderBy sur un seul champ pour éviter les erreurs d'index.
-                const q = query(scoresCollection, orderBy("score", "desc"), limit(10));
-                
-                // onSnapshot pour un classement en temps réel
-                onSnapshot(q, (snapshot) => {
-                    const scores = [];
-                    snapshot.forEach((doc) => {
-                        scores.push(doc.data());
-                    });
-                    
-                    // Tri en mémoire pour être sûr, si des règles de tri plus complexes étaient nécessaires
-                    scores.sort((a, b) => b.score - a.score);
-                    
-                    leaderboardElement.innerHTML = '';
-                    if (scores.length === 0) {
-                        leaderboardElement.innerHTML = '<p class="text-gray-500 text-center">Aucun score pour le moment. Soyez le premier !</p>';
-                    } else {
-                        scores.forEach((s, index) => {
-                            const scoreItem = document.createElement('div');
-                            scoreItem.classList.add('flex', 'justify-between', 'items-center', 'py-2', 'px-4', 'bg-gray-100', 'rounded-lg');
-                            scoreItem.innerHTML = `
-                                <span class="font-bold text-lg">${index + 1}.</span>
-                                <span class="text-gray-700">${s.userId.substring(0, 8)}...</span>
-                                <span class="font-bold text-blue-600">${s.score} points</span>
-                            `;
-                            leaderboardElement.appendChild(scoreItem);
+            // On ne tente de charger que si Firebase est prêt
+            if (isDbReady) {
+                loadingElement.classList.remove('hidden');
+                leaderboardElement.innerHTML = '';
+                userIdDisplay.textContent = userId || "Non connecté";
+                try {
+                    const scoresCollection = collection(db, `artifacts/${appId}/public/data/scores`);
+                    const q = query(scoresCollection, orderBy("score", "desc"), limit(10));
+
+                    onSnapshot(q, (snapshot) => {
+                        const scores = [];
+                        snapshot.forEach((doc) => {
+                            scores.push(doc.data());
                         });
-                    }
+
+                        scores.sort((a, b) => b.score - a.score);
+
+                        leaderboardElement.innerHTML = '';
+                        if (scores.length === 0) {
+                            leaderboardElement.innerHTML = '<p class="text-gray-500 text-center">Aucun score pour le moment. Soyez le premier !</p>';
+                        } else {
+                            scores.forEach((s, index) => {
+                                const scoreItem = document.createElement('div');
+                                scoreItem.classList.add('flex', 'justify-between', 'items-center', 'py-2', 'px-4', 'bg-gray-100', 'rounded-lg');
+                                scoreItem.innerHTML = `
+                                    <span class="font-bold text-lg">${index + 1}.</span>
+                                    <span class="text-gray-700">${s.userId ? s.userId.substring(0, 8) + '...' : 'Anonyme'}</span>
+                                    <span class="font-bold text-blue-600">${s.score} points</span>
+                                `;
+                                leaderboardElement.appendChild(scoreItem);
+                            });
+                        }
+                        loadingElement.classList.add('hidden');
+                    });
+                } catch (error) {
+                    console.error("Erreur lors du chargement du classement:", error);
                     loadingElement.classList.add('hidden');
-                });
-            } catch (error) {
-                console.error("Erreur lors du chargement du classement:", error);
+                    leaderboardElement.innerHTML = '<p class="text-red-500 text-center">Erreur de chargement du classement.</p>';
+                }
+            } else {
                 loadingElement.classList.add('hidden');
-                leaderboardElement.innerHTML = '<p class="text-red-500 text-center">Erreur de chargement du classement.</p>';
+
             }
+        }
+
+        function displayAppreciationMessage(finalScore) {
+            let message = '';
+            if (finalScore === 10) {
+                message = "Félicitations ! Vous êtes un véritable expert de l'administration ISI !";
+            } else if (finalScore >= 7) {
+                message = "Excellent travail ! Vous avez une très bonne connaissance de l'équipe.";
+            } else if (finalScore >= 4) {
+                message = "Bon effort ! Continuez à vous entraîner pour améliorer votre score.";
+            } else {
+                message = "Pas de panique ! C'est une excellente occasion d'apprendre. Rejouez pour vous améliorer !";
+            }
+            appreciationMessage.textContent = message;
         }
 
         function endGame() {
             gameContainer.classList.add('hidden');
             leaderboardContainer.classList.remove('hidden');
             leaderboardContainer.classList.add('quiz-fade-in');
-            saveScore(score, userId);
+            displayAppreciationMessage(score);
+            saveScore(score);
             fetchLeaderboard();
         }
 
@@ -526,13 +584,10 @@
             resetGame();
         });
 
-        // Démarrage du jeu au chargement de la page
-        window.onload = function() {
+        document.addEventListener('DOMContentLoaded', () => {
             shuffleArray(shuffledPeople);
-            signIn().then(() => {
-                loadQuestion();
-            });
-        };
+            loadQuestion();
+        });
     </script>
 </body>
 
